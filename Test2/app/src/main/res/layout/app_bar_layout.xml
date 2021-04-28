@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        style="@style/Theme.AppCompat.Light"
+        android:text="@string/trending"
+        android:gravity="center"
+        android:textSize="21sp"
+        android:textColor="#25282B"
+        android:fontFamily="sans-serif-medium"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"/>
+
+</RelativeLayout>

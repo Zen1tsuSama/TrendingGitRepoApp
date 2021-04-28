@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp">
+    
+    <RelativeLayout
+        android:id="@+id/total_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/image_view"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/ic_launcher_round"
+            app:civ_border_width="2dp"
+            app:civ_border_color="@color/white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_name"
+            android:id="@+id/user_name"
+            android:layout_toEndOf="@id/image_view"
+            android:fontFamily="sans-serif"
+            android:textColor="#52575C"
+            android:layout_marginStart="16dp"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resource_data"
+            android:id="@+id/resource_data"
+            android:layout_toEndOf="@id/image_view"
+            android:layout_below="@id/user_name"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#52575C"
+            android:textStyle="bold"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:textSize="15sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rest_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/resource_data"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="8dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/description"
+                android:id="@+id/description"
+                android:fontFamily="sans-serif"
+                android:textColor="#52575C"
+                android:textSize="12sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/description"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language"
+                    android:id="@+id/language"
+                    android:fontFamily="sans-serif"
+                    android:textColor="#52575C"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="16dp"/>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/star_yellow_16" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stars"
+                    android:id="@+id/stars"
+                    android:fontFamily="sans-serif"
+                    android:textColor="#52575C"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="16dp"/>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/fork_black_16" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/shares"
+                    android:id="@+id/shares"
+                    android:fontFamily="sans-serif"
+                    android:textColor="#52575C"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Trending</string>
+    <string name="user_name">user name</string>
+    <string name="resource_data">Resource Data</string>
+    <string name="description">Description  of the content to be added after fetching results</string>
+    <string name="stars">stars</string>
+    <string name="language">lang</string>
+    <string name="shares">shares</string>
+    <string name="sort_by_stars">Sort by stars</string>
+    <string name="sort_by_names">Sort by names</string>
+    <string name="trending">Trending</string>
+</resources>
