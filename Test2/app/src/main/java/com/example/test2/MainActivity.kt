@@ -1,82 +1,125 @@
 package com.example.test2
 
-import android.os.AsyncTask
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
-import android.widget.TextView
-import androidx.appcompat.app.ActionBar
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.squareup.okhttp.Callback
 import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
+import com.squareup.okhttp.Response
+import java.io.*
+import java.lang.reflect.Type
+
 
 class MainActivity : AppCompatActivity() {
 
-    var hasResult: Boolean = false
+    lateinit var recyclerView: RecyclerView
+    lateinit var myPref: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-//        supportActionBar?.setCustomView(R.layout.app_bar_layout)
+        myPref = applicationContext.getSharedPreferences("MyPref", Context.MODE_PRIVATE)
 
-        getTrendingRepoData().execute()
-        val exampleList = generateDummyList(20)
-
-        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
-        recyclerView.adapter = RecyclerViewAdapter(exampleList)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView = findViewById(R.id.recycler_view)
         recyclerView.setHasFixedSize(true)
+
+        checkSharedPrefs()
+        val cachedStr = CacheFileUtil.readFromCache(applicationContext)
+
+        if (cachedStr.isEmpty()) {
+            if (isOnline()) {
+                fetchJson()
+            } else {
+                startActivity(Intent(this@MainActivity, NoInternetActivity::class.java))
+                finish()
+            }
+        } else {
+            val collectionType: Type = object : TypeToken<List<TrendingFeed?>?>() {}.type
+            val trendingFeed: List<TrendingFeed> = Gson()
+                .fromJson(cachedStr, collectionType) as List<TrendingFeed>
+
+            runOnUiThread {
+                recyclerView.adapter = RecyclerViewAdapter(trendingFeed, true)
+            }
+        }
     }
 
-    internal inner class getTrendingRepoData : AsyncTask<Void, Void, String> () {
+    private fun fetchJson() {
+        val url =
+            "https://private-anon-d3c85ad60d-githubtrendingapi.apiary-mock.com/repositories?language=&since=daily&spoken_language_code="
+        val request = Request.Builder().url(url).build()
 
-        override fun doInBackground(vararg params: Void?): String {
-            val client = OkHttpClient()
-            val url = "https://zen1tsusama.github.io/CV/hobbies.html"
-            val request = Request.Builder().url(url).build()
-            val response = client.newCall(request).execute()
+        OkHttpClient().newCall(request).enqueue(object: Callback {
+            override fun onResponse(response: Response?) {
+                val jsonStr = response?.body()?.string().toString()
+                val collectionType: Type = object : TypeToken<List<TrendingFeed?>?>() {}.type
+                val trendingFeed: List<TrendingFeed> = Gson()
+                        .fromJson(jsonStr, collectionType) as List<TrendingFeed>
 
-            if (response != null) {
-                hasResult = true
+                runOnUiThread {
+                    recyclerView.adapter = RecyclerViewAdapter(trendingFeed, false)
+                }
+
+                CacheFileUtil.clearCacheFileData(myPref, applicationContext)
+                CacheFileUtil.writeToCache(jsonStr, applicationContext)
+                myPref.edit().putString("insertTime", System.currentTimeMillis().toString()).apply()
             }
 
-            return response.body()?.string().toString()
-        }
-
-        override fun onPostExecute(result: String?) {
-            super.onPostExecute(result)
-
-            val textView: TextView = findViewById(R.id.text_view_id)
-            if (hasResult) {
-                textView.text = result
-            } else {
-                textView.text = "Failed"
+            override fun onFailure(request: Request?, e: IOException?) {
+                startActivity(Intent(this@MainActivity, NoInternetActivity::class.java))
+                finish()
             }
+        })
+    }
 
+    private fun isOnline(): Boolean {
+        val connectivityManager =
+            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            return activeNetworkInfo != null
         }
 
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    private fun checkSharedPrefs() {
+        val insertTimeStr = myPref.getString("insertTime", "0")
+        val currentTime = System.currentTimeMillis()
+        try {
+            val insertTime = insertTimeStr?.toLong()
+
+            if (currentTime - insertTime!! > 7200000) {
+                CacheFileUtil.clearCacheFileData(myPref, applicationContext)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_resource_file, menu)
         return true
-    }
-
-    private fun generateDummyList(size: Int): List<ItemClass> {
-        val list = ArrayList<ItemClass>()
-        for (i in 0 until size) {
-            val drawable = when (i % 3) {
-                0 -> R.drawable.ic_launcher_background
-                1 -> R.drawable.ic_launcher_foreground
-                else -> R.drawable.ic_search_black_24dp
-            }
-            val item = ItemClass(drawable, "Item $i", "Resource data for $i",
-                        "Description for $i", "C++", "1201", "101")
-            list += item
-        }
-        return list
     }
 }

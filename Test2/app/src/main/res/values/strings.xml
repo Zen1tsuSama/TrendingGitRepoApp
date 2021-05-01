@@ -9,4 +9,7 @@
     <string name="sort_by_stars">Sort by stars</string>
     <string name="sort_by_names">Sort by names</string>
     <string name="trending">Trending</string>
+    <string name="something_went_wrong">Something went wrong..</string>
+    <string name="alien">An alien is probably blocking your signal.</string>
+    <string name="retry">RETRY</string>
 </resources>

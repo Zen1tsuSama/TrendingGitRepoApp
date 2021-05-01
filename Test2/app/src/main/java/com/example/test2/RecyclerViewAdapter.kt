@@ -6,10 +6,13 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.NetworkPolicy
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
-class RecyclerViewAdapter(private val itemList: List<ItemClass>) :
+class RecyclerViewAdapter(private val trendingFeed: List<TrendingFeed>, val isOffline: Boolean) :
         RecyclerView.Adapter<RecyclerViewAdapter.ItemViewHolder>() {
+
 
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mainImageView: CircleImageView = itemView.findViewById(R.id.image_view)
@@ -30,25 +33,29 @@ class RecyclerViewAdapter(private val itemList: List<ItemClass>) :
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val currentItem = itemList[position]
-        holder.mainImageView.setImageResource(currentItem.main_image_source)
-        holder.userTextView.text = currentItem.user_name
-        holder.resourceTextView.text = currentItem.resource_data
+        val currentItem = trendingFeed[position]
+        if (isOffline) {
+            Picasso.with(holder.itemView.context).load(currentItem.avatar).networkPolicy(
+                NetworkPolicy.OFFLINE).into(holder.mainImageView)
+        } else {
+            Picasso.with(holder.itemView.context).load(currentItem.avatar).into(
+                holder.mainImageView)
+        }
+        holder.userTextView.text = currentItem.author
+        holder.resourceTextView.text = currentItem.name
         holder.descriptionTextView.text = currentItem.description
         holder.languageTextView.text = currentItem.language
-        holder.starsTextView.text = currentItem.stars
-        holder.sharesTextView.text = currentItem.shares
+        holder.starsTextView.text = currentItem.stars.toString()
+        holder.sharesTextView.text = currentItem.forks.toString()
 
-        val isExpandable: Boolean = itemList[position].expandable
+        val isExpandable: Boolean = trendingFeed[position].expandable
         holder.expandableView.visibility = if (isExpandable) View.VISIBLE else View.GONE
 
         holder.cardView.setOnClickListener {
-            val currentItem = itemList[position]
             currentItem.expandable = !currentItem.expandable
             notifyItemChanged(position)
         }
     }
 
-    override fun getItemCount() = itemList.size
-
+    override fun getItemCount() = trendingFeed.count()
 }
